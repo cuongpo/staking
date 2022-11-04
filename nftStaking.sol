@@ -9,6 +9,7 @@ contract StakingRewards {
     IERC20 public immutable rewardsToken;
     address public nftContract; 
     address public owner;
+    uint256 public collectionId;
 
     // Duration of rewards to be paid out (in seconds)
     uint public duration;
@@ -39,10 +40,11 @@ contract StakingRewards {
         uint256 totalSupply
     );
 
-    constructor(address _rewardsToken,address _nftContract) {
+    constructor(address _rewardsToken,address _nftContract,uint256 collectionId_) {
         owner = msg.sender;
         rewardsToken = IERC20(_rewardsToken);
         nftContract = _nftContract;
+        collectionId = collectionId_;
     }
 
 
@@ -91,6 +93,10 @@ contract StakingRewards {
             nftcontract(nftContract).getApproved(tokenId_) == address(this) ||
                 nftcontract(nftContract).isApprovedForAll(msg.sender, address(this)),
             "The contract is unauthorized to manage this token"
+        );
+        require(
+            nftcontract(nftContract).getCollectionId(tokenId_) == collectionId,
+            "Collection Id is not match"
         );
         uint256 tokenPower = nftcontract(nftContract).getPower(tokenId_);
         require(tokenPower > 0, "token power must be greater than 0");
