@@ -9,29 +9,36 @@ contract StakingRewards {
     IERC20 public immutable rewardsToken;
     address public nftContract; 
     address public owner;
-    uint256 public collectionId;
-
-    // Duration of rewards to be paid out (in seconds)
-    uint public duration;
-    // Timestamp of when the rewards finish
-    uint public finishAt;
-    // Minimum of last updated time and reward finish time
-    uint public updatedAt;
-    // Reward to be paid out per second
-    uint public rewardRate;
-    // Sum of (reward rate * dt * 1e18 / total supply)
-    uint public rewardPerTokenStored;
-    // User address => rewardPerTokenStored
-    mapping(address => uint) public userRewardPerTokenPaid;
-    // User address => rewards to be claimed
-    mapping(address => uint) public rewards;
-    mapping (uint256 => address) public oldOwner;
-
-    // Total staked
-    uint public totalSupply;
-    // User address => staked amount
-    mapping(address => uint) public balanceOf;
     
+
+    // Pool struct
+    struct Pool {
+        // Duration of rewards to be paid out (in seconds)
+        uint duration;
+        // Timestamp of when the rewards finish
+        uint finishAt;
+        // Minimum of last updated time and reward finish time
+        uint updatedAt;
+        // Reward to be paid out per second
+        uint rewardRate;
+        // Sum of (reward rate * dt * 1e18 / total supply)
+        uint rewardPerTokenStored;
+        // User address => rewardPerTokenStored
+        mapping(address => uint) userRewardPerTokenPaid;
+        // User address => rewards to be claimed
+        mapping(address => uint) rewards;
+        mapping (uint256 => address) oldOwner;
+        // Total staked
+        uint totalSupply;
+        // User address => staked amount
+        mapping(address => uint) balanceOf;
+        uint256 collectionId;
+        // Pool Balance
+        uint256 poolBalance;
+    }
+
+    Pool[] public pools;
+
     event nftStaked(
         uint256 tokenId,
         address user,
@@ -40,11 +47,10 @@ contract StakingRewards {
         uint256 totalSupply
     );
 
-    constructor(address _rewardsToken,address _nftContract,uint256 collectionId_) {
+    constructor(address _rewardsToken,address _nftContract) {
         owner = msg.sender;
         rewardsToken = IERC20(_rewardsToken);
         nftContract = _nftContract;
-        collectionId = collectionId_;
     }
 
 
@@ -54,36 +60,37 @@ contract StakingRewards {
         _;
     }
 
-    modifier updateReward(address _account) {
-        rewardPerTokenStored = rewardPerToken();
-        updatedAt = lastTimeRewardApplicable();
+    modifier updateReward(uint _index,address _account) {
+        pools[_index].rewardPerTokenStored = rewardPerToken(_index);
+        pools[_index].updatedAt = lastTimeRewardApplicable(_index);
 
         if (_account != address(0)) {
-            rewards[_account] = earned(_account);
-            userRewardPerTokenPaid[_account] = rewardPerTokenStored;
+            pools[_index].rewards[_account] = earned(_account,_index);
+            pools[_index].userRewardPerTokenPaid[_account] = pools[_index].rewardPerTokenStored;
         }
 
         _;
     }
 
-    function lastTimeRewardApplicable() public view returns (uint) {
+    function lastTimeRewardApplicable(uint _index) public view returns (uint) {
         // Code
-        if (block.timestamp <= finishAt) {
+        if (block.timestamp <= pools[_index].finishAt) {
             return (block.timestamp);
         } else {
-            return finishAt;
+            return pools[_index].finishAt;
         }
     }
 
-    function rewardPerToken() public view returns (uint) {
+    function rewardPerToken(uint _index) public view returns (uint) {
         // Code
-        if (totalSupply == 0) {
-            return rewardPerTokenStored;
+        if (pools[_index].totalSupply == 0) {
+            return pools[_index].rewardPerTokenStored;
         }
-        return rewardPerTokenStored + (rewardRate * (lastTimeRewardApplicable() - updatedAt) * 1e18) /totalSupply;
+        uint time = lastTimeRewardApplicable(_index);
+        return pools[_index].rewardPerTokenStored + (pools[_index].rewardRate * (time - pools[_index].updatedAt) * 1e18) /pools[_index].totalSupply;
     }
 
-    function stake(uint256 tokenId_) external updateReward(msg.sender){
+    function stake(uint256 tokenId_,uint _index) external updateReward(_index,msg.sender){
         // Code
         require(
             nftcontract(nftContract).ownerOf(tokenId_) == msg.sender,
@@ -95,62 +102,62 @@ contract StakingRewards {
             "The contract is unauthorized to manage this token"
         );
         require(
-            nftcontract(nftContract).getCollectionId(tokenId_) == collectionId,
+            nftcontract(nftContract).getCollectionId(tokenId_) == pools[_index].collectionId,
             "Collection Id is not match"
         );
         uint256 tokenPower = nftcontract(nftContract).getPower(tokenId_);
         require(tokenPower > 0, "token power must be greater than 0");
         nftcontract(nftContract).transferFrom(msg.sender, address(this), tokenId_); 
-        balanceOf[msg.sender] = balanceOf[msg.sender] + tokenPower;
-        totalSupply = totalSupply + tokenPower;
-        oldOwner[tokenId_] = msg.sender;
-        emit nftStaked(tokenId_,msg.sender,tokenPower,balanceOf[msg.sender],totalSupply);
+        pools[_index].balanceOf[msg.sender] = pools[_index].balanceOf[msg.sender] + tokenPower;
+        pools[_index].totalSupply = pools[_index].totalSupply + tokenPower;
+        pools[_index].oldOwner[tokenId_] = msg.sender;
+        emit nftStaked(tokenId_,msg.sender,tokenPower,pools[_index].balanceOf[msg.sender],pools[_index].totalSupply);
 
     }
 
-    function withdraw(uint256 tokenId_) external updateReward(msg.sender){
+    function withdraw(uint256 tokenId_,uint _index) external updateReward(_index,msg.sender){
         // Code
-        require (oldOwner[tokenId_] == msg.sender,"not the old owner");
+        require (pools[_index].oldOwner[tokenId_] == msg.sender,"not the old owner");
         uint256 tokenPower = nftcontract(nftContract).getPower(tokenId_);
-        balanceOf[msg.sender] -= tokenPower;
-        totalSupply -= tokenPower;
+        pools[_index].balanceOf[msg.sender] -= tokenPower;
+        pools[_index].totalSupply -= tokenPower;
         nftcontract(nftContract).transferFrom(address(this),msg.sender,tokenId_);
     }
 
-    function earned(address _account) public view returns (uint) {
+    function earned(address _account,uint _index) public view returns (uint) {
         // Code
         return
-        ((balanceOf[_account] *
-            (rewardPerToken() - userRewardPerTokenPaid[_account])) / 1e18) +
-        rewards[_account];
+        ((pools[_index].balanceOf[_account] *
+            (rewardPerToken(_index) - pools[_index].userRewardPerTokenPaid[_account])) / 1e18) +
+        pools[_index].rewards[_account];
     }
 
-    function getReward() external updateReward(msg.sender) {
+    function getReward(uint _index) external updateReward(_index,msg.sender) {
         // Code
-        uint reward = rewards[msg.sender];
+        uint reward = pools[_index].rewards[msg.sender];
         if (reward > 0) {
-            rewards[msg.sender] = 0;
+            pools[_index].rewards[msg.sender] = 0;
             rewardsToken.transfer(msg.sender, reward);
         }
     }
 
-    function setRewardsDuration(uint _duration) external onlyOwner {
+    function setRewardsDuration(uint _duration,uint _index) external onlyOwner {
         // Code
-        require(block.timestamp > finishAt, "previous reward duration not finished");
-        duration = _duration;
+        require(block.timestamp > pools[_index].finishAt, "previous reward duration not finished");
+        pools[_index].duration = _duration;
     }
 
-    function notifyRewardAmount(uint _amount) external onlyOwner updateReward(address(0)){
+    function notifyRewardAmount(uint _amount,uint _index) external onlyOwner updateReward(_index,address(0)){
         // Code
-        if (block.timestamp >= finishAt) {
-            rewardRate = _amount/duration;
+        if (block.timestamp >= pools[_index].finishAt) {
+            pools[_index].rewardRate = _amount/pools[_index].duration;
         } else {
-            rewardRate = (_amount + rewardRate*(finishAt - block.timestamp))/duration;
+            pools[_index].rewardRate = (_amount + pools[_index].rewardRate*(pools[_index].finishAt - block.timestamp))/pools[_index].duration;
         }
-        require (rewardRate > 0,"Reward rate must greater than zero");
-        require (rewardRate * duration <= rewardsToken.balanceOf(address(this)), "Reward amount > balance");
-        updatedAt = block.timestamp;
-        finishAt = block.timestamp + duration;
+        require (pools[_index].rewardRate > 0,"Reward rate must greater than zero");
+        require (pools[_index].rewardRate * pools[_index].duration <= pools[_index].poolBalance, "Reward amount > balance");
+        pools[_index].updatedAt = block.timestamp;
+        pools[_index].finishAt = block.timestamp + pools[_index].duration;
     }
 
     function _min(uint x, uint y) private pure returns (uint) {
@@ -159,5 +166,16 @@ contract StakingRewards {
 
     function getPower(uint256 _tokenId) public view returns(uint256) {
         return(nftcontract(nftContract).getPower(_tokenId));
+    }
+
+    function createPool (uint _collectionId) external {
+        Pool storage newPool = pools.push();
+        newPool.collectionId = _collectionId;
+    }
+
+    function deposit(uint _amount,uint _index) external {
+        require (_amount>0,"amount must greater than zero");
+        IERC20(rewardsToken).transferFrom(msg.sender,address(this),_amount);
+        pools[_index].poolBalance += _amount;
     }
 }
