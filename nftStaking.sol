@@ -173,9 +173,9 @@ contract StakingRewards {
         newPool.collectionId = _collectionId;
     }
 
-    function deposit(uint _amount,uint _index) external {
+    function deposit(uint _amount,uint _index) external payable {
         require (_amount>0,"amount must greater than zero");
-        IERC20(rewardsToken).transferFrom(msg.sender,address(this),_amount);
+        rewardsToken.transferFrom(msg.sender,address(this),_amount);
         pools[_index].poolBalance += _amount;
     }
 }
