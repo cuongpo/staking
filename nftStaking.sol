@@ -138,6 +138,7 @@ contract StakingRewards {
         if (reward > 0) {
             pools[_index].rewards[msg.sender] = 0;
             rewardsToken.transfer(msg.sender, reward);
+            pools[_index].poolBalance -= reward;
         }
     }
 
