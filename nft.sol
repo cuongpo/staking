@@ -93,4 +93,8 @@ contract nftcontract is ERC721, Ownable {
     function getPower (uint256 tokenId) public view returns(uint256) {
         return _tokenPower[tokenId];
     }
+
+    function getCollectionId (uint256 tokenId) public view returns(uint256) {
+        return _collectionId[tokenId];
+    }
 }
