@@ -16,12 +16,14 @@ contract nftcontract is ERC721, Ownable {
     mapping (uint256 => string) public _tokenURIs;
     mapping (uint256 => string) public _tokenName;
     mapping (uint256 => uint256) public _collectionId;
+    mapping (uint256 => string) public _collectionURIs;
+    mapping (uint256 => uint256) public _collectionThemeId;
     mapping (uint256 => string) public _collectionName;
     mapping (uint256 => address) public _collectionOwner;
     mapping (uint256 => uint256) public _tokenPower;
 
     event MintNFT(uint256 tokenId, address recipient, string tokenURI,string name,uint256 collectionId_,uint256 tokenPower);
-    event CreateCollection(uint256 collectionId,string collectionName,address collectionOwner);
+    event CreateCollection(uint256 collectionId,string collectionName,string collectionURIs,uint256 collectionThemeId,address collectionOwner);
 
     string private _baseURIextended;
 
@@ -78,12 +80,14 @@ contract nftcontract is ERC721, Ownable {
         return _baseURIextended;
     }
 
-    function createCollection(string memory collectionName_) public {
+    function createCollection(string memory collectionName_,string memory collectionURIs,uint256 collectionThemeId) public {
         _collectionIds.increment();
         uint256 newCollectionId = _collectionIds.current();
         _collectionName[newCollectionId] = collectionName_;
         _collectionOwner[newCollectionId] = msg.sender;
-        emit CreateCollection(newCollectionId,collectionName_,msg.sender);
+        _collectionThemeId[newCollectionId] = collectionThemeId;
+        _collectionURIs[newCollectionId] = collectionURIs;
+        emit CreateCollection(newCollectionId,collectionName_,collectionURIs,collectionThemeId,msg.sender);
     }
 
     function getPower (uint256 tokenId) public view returns(uint256) {
