@@ -170,6 +170,9 @@ contract StakingRewards {
     }
 
     function createPool (uint _collectionId) external {
+        require (nftcontract(nftContract).getCollectionOwner(_collectionId)==msg.sender,"not collection owner");
+        (bool check,) = getPoolIdByCollectionId(_collectionId);
+        require (check == false,"collection alreary has pool");
         Pool storage newPool = pools.push();
         newPool.collectionId = _collectionId;
     }
