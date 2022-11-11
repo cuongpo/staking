@@ -179,4 +179,13 @@ contract StakingRewards {
         rewardsToken.transferFrom(msg.sender,address(this),_amount);
         pools[_index].poolBalance += _amount;
     }
+
+    function getPoolIdByCollectionId(uint collectionId) public view returns(bool check,uint256 poodId) {
+        for (uint i = 0; i< pools.length; i ++) {  
+            if (pools[i].collectionId == collectionId) {
+                return(true,i);
+            }     
+        }
+        return(false,0);
+    }
 }
