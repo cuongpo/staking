@@ -46,7 +46,11 @@ contract StakingRewards {
         uint256 userBalance,
         uint256 totalSupply
     );
-
+    event withdrawed (
+        uint256 tokenId,
+        address user,
+        uint256 index 
+    );
     constructor(address _rewardsToken,address _nftContract) {
         owner = msg.sender;
         rewardsToken = IERC20(_rewardsToken);
@@ -122,6 +126,7 @@ contract StakingRewards {
         pools[_index].balanceOf[msg.sender] -= tokenPower;
         pools[_index].totalSupply -= tokenPower;
         nftcontract(nftContract).transferFrom(address(this),msg.sender,tokenId_);
+        emit withdrawed (tokenId_, msg.sender, _index);
     }
 
     function earned(address _account,uint _index) public view returns (uint) {
@@ -184,7 +189,7 @@ contract StakingRewards {
         return (pools[_index].balanceOf[_userAddress]);
     }
 
-    function getUserTotalPowerEarned(address _userAddress,uint _index) public view returns(uint256) {
+    function getUserTotalEarned(address _userAddress,uint _index) public view returns(uint256) {
         return (pools[_index].rewards[_userAddress]);
     }
 
