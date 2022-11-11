@@ -64,6 +64,24 @@
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "tokenId_",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "stake",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "_rewardsToken",
 				"type": "address"
@@ -145,24 +163,6 @@
 				"type": "uint256"
 			}
 		],
-		"name": "stake",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "tokenId_",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_index",
-				"type": "uint256"
-			}
-		],
 		"name": "withdraw",
 		"outputs": [],
 		"stateMutability": "nonpayable",
@@ -186,6 +186,30 @@
 			{
 				"internalType": "uint256",
 				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "collectionId",
+				"type": "uint256"
+			}
+		],
+		"name": "getPoolIdByCollectionId",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "check",
+				"type": "bool"
+			},
+			{
+				"internalType": "uint256",
+				"name": "poodId",
 				"type": "uint256"
 			}
 		],
