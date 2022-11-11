@@ -46,42 +46,6 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "_duration",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_index",
-				"type": "uint256"
-			}
-		],
-		"name": "setRewardsDuration",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "tokenId_",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_index",
-				"type": "uint256"
-			}
-		],
-		"name": "stake",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
 				"internalType": "address",
 				"name": "_rewardsToken",
 				"type": "address"
@@ -154,6 +118,42 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "_duration",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "setRewardsDuration",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId_",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "stake",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
 				"name": "tokenId_",
 				"type": "uint256"
 			},
@@ -196,20 +196,15 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "collectionId",
+				"name": "_tokenId",
 				"type": "uint256"
 			}
 		],
-		"name": "getPoolIdByCollectionId",
+		"name": "getPower",
 		"outputs": [
 			{
-				"internalType": "bool",
-				"name": "check",
-				"type": "bool"
-			},
-			{
 				"internalType": "uint256",
-				"name": "poodId",
+				"name": "",
 				"type": "uint256"
 			}
 		],
@@ -219,12 +214,41 @@
 	{
 		"inputs": [
 			{
+				"internalType": "address",
+				"name": "_userAddress",
+				"type": "address"
+			},
+			{
 				"internalType": "uint256",
-				"name": "_tokenId",
+				"name": "_index",
 				"type": "uint256"
 			}
 		],
-		"name": "getPower",
+		"name": "getUserTotalPowerEarned",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_userAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getUserTotalPowerStaked",
 		"outputs": [
 			{
 				"internalType": "uint256",
