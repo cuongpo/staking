@@ -1,6 +1,6 @@
-// "SPDX-License-Identifier: UNLICENSED"   
+// SPDX-License-Identifier: MIT 
 
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -38,7 +38,9 @@ contract marketplace is Ownable {
     event OrderCanceled (
         uint256 indexed orderId
     );
-
+    event PaymentTokenAdded (
+        address indexed paymentToken_
+    );
     event OrderMatched (
         uint256 indexed orderId,
         address indexed seller,
@@ -112,6 +114,9 @@ contract marketplace is Ownable {
         );
         require (
             _supportedPaymentTokens.add(paymentToken_),"NFT Marketplace: already supported"
+        );
+        emit PaymentTokenAdded(
+            paymentToken_
         );
     }
 
