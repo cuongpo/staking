@@ -219,6 +219,19 @@
 		"type": "event"
 	},
 	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "paymentToken_",
+				"type": "address"
+			}
+		],
+		"name": "PaymentTokenAdded",
+		"type": "event"
+	},
+	{
 		"inputs": [],
 		"name": "renounceOwnership",
 		"outputs": [],
