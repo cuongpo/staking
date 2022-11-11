@@ -185,6 +185,15 @@ contract StakingRewards {
         pools[_index].poolBalance += _amount;
     }
 
+    function getPoolIdByCollectionId(uint256 collectionId) public view returns (bool check,uint256 poolId) {
+        for (uint256 i=0;i<pools.length;i++) {
+            if (pools[i].collectionId == collectionId) {
+                return (true,i);
+            } 
+        }
+        return (false,0);
+    }
+
     function getUserTotalPowerStaked(address _userAddress,uint _index) public view returns(uint256) {
         return (pools[_index].balanceOf[_userAddress]);
     }
