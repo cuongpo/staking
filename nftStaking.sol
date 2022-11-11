@@ -145,8 +145,9 @@ contract StakingRewards {
         }
     }
 
-    function setRewardsDuration(uint _duration,uint _index) external onlyOwner {
+    function setRewardsDuration(uint _duration,uint _index) external {
         // Code
+        require (nftcontract(nftContract).getCollectionOwner(pools[_index].collectionId)==msg.sender,"not collection owner");
         require(block.timestamp > pools[_index].finishAt, "previous reward duration not finished");
         pools[_index].duration = _duration;
     }
