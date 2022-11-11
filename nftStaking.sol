@@ -57,8 +57,6 @@ contract StakingRewards {
         nftContract = _nftContract;
     }
 
-
-
     modifier onlyOwner() {
         require(msg.sender == owner, "not authorized");
         _;
@@ -153,7 +151,8 @@ contract StakingRewards {
         pools[_index].duration = _duration;
     }
 
-    function notifyRewardAmount(uint _amount,uint _index) external onlyOwner updateReward(_index,address(0)){
+    function notifyRewardAmount(uint _amount,uint _index) external updateReward(_index,address(0)){
+        require (nftcontract(nftContract).getCollectionOwner(pools[_index].collectionId)==msg.sender,"not collection owner");
         // Code
         if (block.timestamp >= pools[_index].finishAt) {
             pools[_index].rewardRate = _amount/pools[_index].duration;
