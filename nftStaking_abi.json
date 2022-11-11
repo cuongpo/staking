@@ -221,6 +221,30 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "collectionId",
+				"type": "uint256"
+			}
+		],
+		"name": "getPoolIdByCollectionId",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "check",
+				"type": "bool"
+			},
+			{
+				"internalType": "uint256",
+				"name": "poolId",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
 				"name": "_tokenId",
 				"type": "uint256"
 			}
