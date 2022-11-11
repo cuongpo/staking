@@ -170,9 +170,6 @@ contract StakingRewards {
     }
 
     function createPool (uint _collectionId) external {
-        require (nftcontract(nftContract).getCollectionOwner(_collectionId)==msg.sender,"not collection owner");
-        (bool check,) = getPoolIdByCollectionId(_collectionId);
-        require (check == false,"collection alreary has pool");
         Pool storage newPool = pools.push();
         newPool.collectionId = _collectionId;
     }
@@ -183,12 +180,12 @@ contract StakingRewards {
         pools[_index].poolBalance += _amount;
     }
 
-    function getPoolIdByCollectionId(uint collectionId) public view returns(bool check,uint256 poodId) {
-        for (uint i = 0; i< pools.length; i ++) {  
-            if (pools[i].collectionId == collectionId) {
-                return(true,i);
-            }     
-        }
-        return(false,0);
+    function getUserTotalPowerStaked(address _userAddress,uint _index) public view returns(uint256) {
+        return (pools[_index].balanceOf[_userAddress]);
     }
+
+    function getUserTotalPowerEarned(address _userAddress,uint _index) public view returns(uint256) {
+        return (pools[_index].rewards[_userAddress]);
+    }
+
 }
